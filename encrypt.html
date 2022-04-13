@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <script src="./js/crypto-js.js"></script>
+  <script src="./js/FileSaver.js"></script>
+  <meta charset="UTF-8">
+  <title>Encrypt</title>
+  
+  <link rel="stylesheet" href="./css/style.css">
+
+</head>
+<body>
+  <h1 id="title">Encrypt your picture</h1>
+  <div class="zone">
+    <div id="dropZ">
+      <i class="fa fa-cloud-upload"></i>
+      <div>Drag and drop your file here</div>                    
+      <span>OR</span>
+      <div class="selectFile">       
+        <label for="file">Select file</label>                   
+        <input type="file" accept="image/*" name="files[]" id="file" onchange="loadFile(event)">
+      </div>
+      <p>File size limit : 10 MB</p>
+    </div>
+  </div>
+
+  <div class="zone-image">
+    <img id="output" width="400" style="margin-top: 30px; position: relative;"/> 
+    <label>
+      <input type="text" id="secret" placeholder="Enter your secret key">
+      <button onclick="encryptToDES()">Encrypt</button>
+    </label>   
+  </div>
+
+  <script>
+    var data;
+    var loadFile = function(event) {
+	    var image = document.getElementById('output');
+	    image.src = URL.createObjectURL(event.target.files[0]);
+    };
+    var img = document.getElementById('output');
+    img.crossOrigin = 'Anonymous';
+    img.onload = function(){
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        canvas.height = this.naturalHeight;
+        canvas.width = this.naturalWidth;
+        ctx.drawImage(this,0,0);
+        data = canvas.toDataURL('image/jpeg');
+    };
+    function encryptToDES() {
+      var secretKey = document.getElementById('secret').value;
+      if(secretKey != ''){
+        var fileName = "encrypted_image";
+        var plainText = data;
+        var encryptedText = CryptoJS.TripleDES.encrypt(plainText, secretKey);
+        saveAs(new File([encryptedText], fileName, {type: "text/plain;charset=utf-8"}));
+      }
+      else {
+        alert("Please enter your secret key!");
+      }
+    }
+  </script>
+</body>
+</html>
